@@ -1,6 +1,6 @@
 /**
- * search.js
- * Universal execution script (Mobile Sandbox + Desktop Node.js)
+ * search.js — DuckDuckGo Instant Answer API lookup
+ * Usage: node search.js "your search topic"
  */
 
 async function performSearch(searchQuery) {
@@ -8,7 +8,7 @@ async function performSearch(searchQuery) {
     return JSON.stringify({ error: "No search topic provided." });
   }
 
-  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(searchQuery)}&format=json`;
+  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(searchQuery)}&format=json&no_redirect=1&no_html=1`;
 
   try {
     const response = await fetch(url);
@@ -17,10 +17,13 @@ async function performSearch(searchQuery) {
     if (data.AbstractText && data.AbstractURL) {
       return JSON.stringify({ information: data.AbstractText, source: data.AbstractURL });
     } else if (data.RelatedTopics && data.RelatedTopics.length > 0 && data.RelatedTopics[0].Text) {
-      return JSON.stringify({ information: data.RelatedTopics[0].Text, source: data.RelatedTopics[0].FirstURL });
+      return JSON.stringify({
+        information: data.RelatedTopics[0].Text,
+        source: data.RelatedTopics[0].FirstURL
+      });
     } else {
       return JSON.stringify({
-        information: "No clear summary found for this topic.",
+        information: null,
         source: `https://duckduckgo.com/?q=${encodeURIComponent(searchQuery)}`
       });
     }
@@ -29,12 +32,10 @@ async function performSearch(searchQuery) {
   }
 }
 
-// ENVIRONMENT CHECK: Node.js (VS Code) vs Sandbox (Mobile)
+// Node.js (VS Code / Desktop) vs Mobile Sandbox
 if (typeof process !== 'undefined' && process.argv) {
-  // We are in VS Code / Desktop Terminal
   const terminalQuery = process.argv.slice(2).join(' ');
   performSearch(terminalQuery).then(console.log).catch(console.error);
 } else {
-  // We are in AI Edge Gallery Mobile Sandbox
-  return performSearch(query);
+  return performSearch(query); // eslint-disable-line no-undef
 }
