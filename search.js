@@ -1,6 +1,6 @@
 /**
  * search.js
- * Mobile-friendly execution script using standard Web APIs.
+ * Universal execution script (Mobile Sandbox + Desktop Node.js)
  */
 
 async function performSearch(searchQuery) {
@@ -8,7 +8,6 @@ async function performSearch(searchQuery) {
     return JSON.stringify({ error: "No search topic provided." });
   }
 
-  // Using DuckDuckGo's free instant answer API
   const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(searchQuery)}&format=json`;
 
   try {
@@ -16,19 +15,10 @@ async function performSearch(searchQuery) {
     const data = await response.json();
 
     if (data.AbstractText && data.AbstractURL) {
-      // Primary abstract found
-      return JSON.stringify({
-        information: data.AbstractText,
-        source: data.AbstractURL
-      });
+      return JSON.stringify({ information: data.AbstractText, source: data.AbstractURL });
     } else if (data.RelatedTopics && data.RelatedTopics.length > 0 && data.RelatedTopics[0].Text) {
-      // Fallback to the first related topic
-      return JSON.stringify({
-        information: data.RelatedTopics[0].Text,
-        source: data.RelatedTopics[0].FirstURL
-      });
+      return JSON.stringify({ information: data.RelatedTopics[0].Text, source: data.RelatedTopics[0].FirstURL });
     } else {
-      // Fallback when no clear summary is generated
       return JSON.stringify({
         information: "No clear summary found for this topic.",
         source: `https://duckduckgo.com/?q=${encodeURIComponent(searchQuery)}`
@@ -39,5 +29,12 @@ async function performSearch(searchQuery) {
   }
 }
 
-// Return the promise so the AI Edge runtime can resolve it
-return performSearch(query);
+// ENVIRONMENT CHECK: Node.js (VS Code) vs Sandbox (Mobile)
+if (typeof process !== 'undefined' && process.argv) {
+  // We are in VS Code / Desktop Terminal
+  const terminalQuery = process.argv.slice(2).join(' ');
+  performSearch(terminalQuery).then(console.log).catch(console.error);
+} else {
+  // We are in AI Edge Gallery Mobile Sandbox
+  return performSearch(query);
+}

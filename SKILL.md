@@ -14,7 +14,8 @@ You are equipped with a local web search tool. When the user asks for informatio
 5. ALWAYS append the `source` URL to the end of your response so the user can verify the information.
 
 ### Execution
-Run `search.js` securely in the sandboxed JavaScript environment.
+- **On Mobile:** Run `search.js` securely in the sandboxed JavaScript environment passing the `query` variable.
+- **On Desktop/IDE:** Run the terminal command `node search.js "{{query}}"` inside the skill directory.
 
 ### Constraints
 - Do not hallucinate or make up URLs. Only provide the exact URL returned by the script.
