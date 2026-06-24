@@ -1,5 +1,7 @@
-# Name: Web Search Assistant
-# Description: Performs a mobile-friendly web search to find the latest information on a user's topic and provides the source URL.
+---
+name: Web Search Assistant
+description: Performs a mobile-friendly web search to find the latest information on a user's topic and provides the source URL.
+---
 
 ## Instructions
 You are equipped with a local web search tool. When the user asks for information, facts, or news about a specific topic, you must execute the provided search script to find the answer.
